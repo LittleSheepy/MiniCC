@@ -160,8 +160,6 @@ def agent_loop(messages: list, context: dict, active_request: str):
         trigger_hooks("EndOfLoop", messages, active_request)
 
 
-
-
 def block_type(block):
     return block.get("type") if isinstance(block, dict) else getattr(block, "type", None)
 
@@ -247,6 +245,7 @@ if __name__ == "__main__":
 
 
 """
+spawn_teammate 直接调这个工具,任命Alice为后端开发人员，任务是task_07e38f83
 创建一个任务:创建一个名为“hello.py”的文件，该文件需输出“Hello, World!”这一信息。然后为每个任务创建工作区。任命Alice为后端开发人员，发送任务
 创建一个任务:创建一个名为“hello.py”的文件，该文件需输出“Hello, World!”这一信息。任命Alice为后端开发人员，发送任务
 创建一个任务:创建一个名为‘schema.sql’的文件，并在其中建立一个‘teacher’表。

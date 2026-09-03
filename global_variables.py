@@ -8,6 +8,16 @@ WORKDIR = Path.cwd()
 # task
 task_lock = threading.RLock()
 
+@dataclass
+class Task:
+    id: str
+    subject: str
+    description: str
+    status: str                     # pending | in_progress | completed  待定 | 进行中 | 已完成
+    owner: str | None
+    blockedBy: list[str]
+    worktree: str | None = None
+
 # team
 # working | waiting_approval | idle | stopping
 active_teammates: dict[str, str] = {}

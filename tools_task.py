@@ -6,10 +6,9 @@ import re
 import secrets
 import threading
 from contextlib import contextmanager
-from dataclasses import asdict, dataclass
+from dataclasses import asdict
 from pathlib import Path
-from global_variables import task_lock, teammate_assignments, assignment_versions
-from worktrees_tmp import task_worktree_cwd, assignment_cwd
+from global_variables import task_lock, teammate_assignments, assignment_versions, Task
 
 WORKDIR = Path.cwd()
 TASKS_DIR = WORKDIR / ".tasks"
@@ -94,15 +93,6 @@ def task_store_lock():
                 handle.close()
                 del _task_store_state.handle
 
-@dataclass
-class Task:
-    id: str
-    subject: str
-    description: str
-    status: str                     # pending | in_progress | completed  待定 | 进行中 | 已完成
-    owner: str | None
-    blockedBy: list[str]
-    worktree: str | None = None
 
 def _task_path(task_id: str) -> Path:
     if not isinstance(task_id, str) or not TASK_ID_PATTERN.fullmatch(task_id):
@@ -196,12 +186,6 @@ def create_task(subject: str, description: str = "", blockedBy: list[str] | None
 def save_task(task: Task):
     TASKS.save(task)
 
-def run_create_task(subject: str, description: str = "", blockedBy: list[str] | None = None) -> str:
-    task = create_task(subject, description, blockedBy)
-    deps = f" (blockedBy: {', '.join(blockedBy)})" if blockedBy else ""
-    print(f"  \033[34m[create] {task.subject}{deps}\033[0m")
-    return f"Created {task.id}: {task.subject}{deps}"
-
 def load_task(task_id: str) -> Task:
     return TASKS.load(task_id)
 
@@ -234,6 +218,7 @@ def can_start(task_id: str) -> bool:
 
 # 获取一个依赖项已完成的待办任务。
 def claim_task(task_id: str, owner: str = "agent") -> str:
+    from worktrees import task_worktree_cwd
     """Atomically claim one task and bind the owner's filesystem cwd."""
     with task_store_lock():
         task = load_task(task_id)
@@ -290,6 +275,7 @@ def claim_task(task_id: str, owner: str = "agent") -> str:
 #     return message
 
 def complete_task(task_id: str, owner: str = "agent") -> str:
+    from worktrees import task_worktree_cwd
     """Complete an assignment only when the caller owns it."""
     with task_store_lock():
         task = load_task(task_id)
@@ -317,21 +303,11 @@ def complete_task(task_id: str, owner: str = "agent") -> str:
         print(f"  [unblocked] {', '.join(unblocked)}")
     return msg
 
-
-
-
-
-
-def run_create_task(subject: str, description: str = "",
-                    blockedBy: list[str] | None = None) -> str:
+def run_create_task(subject: str, description: str = "", blockedBy: list[str] | None = None) -> str:
     task = create_task(subject, description, blockedBy)
-    dependencies = (
-        f" (blockedBy: {', '.join(task.blockedBy)})"
-        if task.blockedBy else ""
-    )
-    print(f"  [create] {task.subject}{dependencies}")
-    return f"Created {task.id}: {task.subject}{dependencies}"
-
+    deps = f" (blockedBy: {', '.join(blockedBy)})" if blockedBy else ""
+    print(f"  \033[34m[create] {task.subject}{deps}\033[0m")
+    return f"Created {task.id}: {task.subject}{deps}"
 
 def run_list_tasks() -> str:
     tasks = list_tasks()

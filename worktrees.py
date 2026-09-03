@@ -2,7 +2,7 @@ import re
 import subprocess
 from pathlib import Path
 
-from tools_task import Task
+from global_variables import Task
 from tools_task import _owner_in_progress
 from tools_task import _task_path
 from tools_task import list_tasks
@@ -44,7 +44,7 @@ def _run_git(args: list[str], cwd: Path | None = None) -> tuple[bool, str]:
     """Run Git without shell interpolation and preserve machine output."""
     try:
         result = subprocess.run(["git", *args], cwd=cwd or WORKDIR,
-            capture_output=True, text=True, timeout=30,
+            capture_output=True, text=True, timeout=30,stdin=subprocess.DEVNULL
         )
     except (OSError, subprocess.TimeoutExpired) as exc:
         return False, f"{type(exc).__name__}: {exc}"
@@ -291,21 +291,31 @@ def remove_worktree(name: str, discard_changes: bool = False) -> str:
 def run_create_worktree(name: str, task_id: str) -> str:
     return create_worktree(name, task_id)
 
+def run_remove_worktree(name: str, discard_changes: bool = True) -> str:
+    return remove_worktree(name, discard_changes)
+
 TOOLS_WORKTREE = [
     {"name": "create_worktree",
      "description": "Create and bind a task worktree.",
      "input_schema": {
          "type": "object",
          "properties": {
-             "name": {"type": "string",
-                      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
-                      "maxLength": 64},
+             "name": {"type": "string", "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,63}$", "maxLength": 64},
              "task_id": {"type": "string"}},
          "required": ["name", "task_id"],
          "additionalProperties": False}},
+    {"name": "remove_worktree",
+     "description": "删除工作副本。若存在未提交的更改，则拒绝操作，除非discard_changes设置为true。",
+     "input_schema": {
+         "type": "object",
+         "properties": {"name": {"type": "string"}, "discard_changes": {"type": "boolean"}},
+         "required": ["name"]}},
 ]
 
-TOOL_HANDLERS_WORKTREE = {"create_worktree": run_create_worktree}
+TOOL_HANDLERS_WORKTREE = {
+    "create_worktree": run_create_worktree,
+    "remove_worktree": run_remove_worktree
+}
 
 
 
