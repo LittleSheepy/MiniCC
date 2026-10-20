@@ -9,16 +9,10 @@ from message_bus import consume_lead_inbox
 from model import client
 from utils import execute_tool
 
-try:
-    import readline
-    readline.parse_and_bind('set bind-tty-special-chars off')
-    READLINE_AVAILABLE = True
-except ImportError:
-    try:
-        import pyreadline3 as readline  # type: ignore
-        READLINE_AVAILABLE = True
-    except ImportError:
-        READLINE_AVAILABLE = False
+import readline
+
+READLINE_AVAILABLE = True
+
 
 from assembly_prompt import assemble_system_prompt_hook, update_context
 from error_recovery import with_retry, RecoveryState, is_prompt_too_long_error, MAX_RECOVERY_RETRIES
@@ -80,9 +74,6 @@ def agent_loop(messages: list, context: dict, active_request: str):
 
         trigger_hooks("BeginOfLoop", messages)
 
-        trigger_output_BeginOfCallLLM = {}
-        trigger_hooks("BeginOfCallLLM", messages, trigger_output_BeginOfCallLLM)
-        SYSTEM = trigger_output_BeginOfCallLLM.get("system", "")
         tools_mcp, handlers_mcp = assemble_tool_pool()
         global TOOLS, TOOL_HANDLERS
         TOOLS = TOOLS + tools_mcp
@@ -206,13 +197,9 @@ def async_event_loop(history: list, context: dict, session_state: dict):
             context.update(update_context(context, history))
             print_turn_assistants(history, turn_start)
 
-
-
-# ── Entry point ──────────────────────────────────────────
 if __name__ == "__main__":
-    print("\nCC 助手")
+    print("\nMiniCC 助手")
     print("输入问题，回车发送。输入 q 退出。\n")
-
     CLI_ACTIVE = True
     history = []
     had_teammates = False

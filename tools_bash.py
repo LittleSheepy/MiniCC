@@ -17,7 +17,8 @@ TOOLS_BASH = [{
 
 def run_bash(command: str, cwd: Path | None = None) -> str:
     try:
-        result = subprocess.run(command, shell=True, cwd=cwd or WORKDIR, capture_output=True, text=True, timeout=120)
+        result = subprocess.run(command, shell=True, cwd=cwd or WORKDIR,
+            capture_output=True, text=True, timeout=120, stdin=subprocess.DEVNULL)
         output = (result.stdout + result.stderr).strip()
         output = output[:50000] if output else "(no output)"
         if result.returncode:

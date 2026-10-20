@@ -44,7 +44,7 @@ def _run_git(args: list[str], cwd: Path | None = None) -> tuple[bool, str]:
     """Run Git without shell interpolation and preserve machine output."""
     try:
         result = subprocess.run(["git", *args], cwd=cwd or WORKDIR,
-            capture_output=True, text=True, timeout=30,stdin=subprocess.DEVNULL
+            capture_output=True, text=True, timeout=30, stdin=subprocess.DEVNULL
         )
     except (OSError, subprocess.TimeoutExpired) as exc:
         return False, f"{type(exc).__name__}: {exc}"
