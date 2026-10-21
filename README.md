@@ -1,6 +1,6 @@
 <div align="center" dir="auto">
-    <div class="markdown-heading" class="heading-element"  dir="auto">
-        <h1 tabindex="-1" dir="auto">MiniCC</h1>
+    <div class="markdown-heading" tabindex="-1" class="heading-element"  dir="auto">
+        <h1 dir="auto">MiniCC</h1>
         <h4>一个类似 claude code简单的agent harness</h4>
     </div>
 </div>
