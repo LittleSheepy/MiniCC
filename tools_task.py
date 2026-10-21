@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import json
-import msvcrt
+import sys
 import os
 import re
 import secrets
@@ -9,6 +9,16 @@ from contextlib import contextmanager
 from dataclasses import asdict
 from pathlib import Path
 from global_variables import task_lock, teammate_assignments, assignment_versions, Task
+
+if sys.platform == "win32":
+    import msvcrt
+    def _lock(f): msvcrt.locking(f.fileno(), msvcrt.LK_LOCK, 1)
+    def _unlock(f): msvcrt.locking(f.fileno(), msvcrt.LK_UNLCK, 1)
+else:
+    import fcntl
+    def _lock(f): fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+    def _unlock(f): fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+
 
 WORKDIR = Path.cwd()
 TASKS_DIR = WORKDIR / ".tasks"
