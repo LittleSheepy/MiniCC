@@ -4,7 +4,7 @@ import os
 from anthropic import Anthropic
 from dotenv import load_dotenv
 
-load_dotenv("D:/00sheepy/.env")
+load_dotenv("./.env")
 
 if os.getenv("ANTHROPIC_BASE_URL"):
     os.environ.pop("ANTHROPIC_AUTH_TOKEN", None)
