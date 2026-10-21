@@ -6,6 +6,10 @@
 </div>
 <hr>
 
+## 项目介绍
+
+这是我学习[learn-claude-code](https://github.com/shareAI-lab/learn-claude-code)项目后，把他的每个部件组合到一起，写了这个简化版的claude code。
+
 ## 快速开始
 
 ```sh
